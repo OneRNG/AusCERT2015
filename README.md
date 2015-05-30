@@ -1,4 +1,4 @@
-Multicore World 2015
+AusCERT2015
 =======
 
-Slides for presentation of Multicore World 2015
+Slides for presentation at AusCERT2015
