@@ -271,6 +271,7 @@
 						<li>NZD $50 - a single OneRNG from bulk manufacturing</li>
 						<li>NZD $90 - a device programmer unit</li>
 						<li>NZD $110 - a single hand-built unit</li>
+						<li>We added an internal form-factor variant</li>
 					</ul>
 				</section>
 
@@ -296,7 +297,51 @@
 					</ul>
 				</section>
 
+				<section>
+					<h2>Next steps for OneRNG</h2>
+					<ul>
+						<li>Providing more PC-side helper code, cross-platform</li>
+						<li>Consider extensions to the firmware (e.g. improve quality monitoring)</li>
+						<li>Run reference systems, to monitor for potential degradation</li>
+						<li>Help others to integrate or re-implement OneRNG designs</li>
+					</ul>	
+				</section>
 			</section>
+
+			<section>
+				<section>
+					<h2><em>+++ATH0</em></h2>
+				</section>
+				<section>
+					<h2>OneRNG</h2>
+					<p><a href="http://onerng.info/">http://onerng.info/</a></p>
+					<hr/>
+				</section>
+			</section>
+
+			<section>
+				<section>
+					<h2>Appendix: Other RNGs</h2>
+				</section>
+				<section>
+					<h2>The more the merrier</h2>
+					<ul>
+					<li>A small quantity of good entropy is enough to improve everything</li>
+					<li>But the more independent sources of entropy you have, the better off you are</li>
+					<li>As well as OneRNG, please add other sources</li>
+					</ul>
+				</section>
+				<section>
+					<h2>Complements to OneRNG</h2>
+					<ul>
+						<li>SW: <strong>rtl-entropy</strong> from SDR - <a href="https://github.com/pwarren/rtl-entropy">https://github.com/pwarren/rtl-entropy</a> (Paul Warren, LCA2014)</li>
+						<li>HW: <strong>USBtrng</strong> - <a href="http://altusmetrum.org/USBtrng/">http://altusmetrum.org/USBtrng/</a> (Bdale Garbee/Keith Packard, DebConf 2014)</li>
+						<li>SW: <strong>Turbid</strong> from audio I/O - <a href="http://www.av8n.com/turbid/">http://www.av8n.com/turbid/</a> (John Denker, 2002-date)</li>
+						<li>HW: <strong>NeuG</strong> ("noisy") - <a href="http://git.gniibe.org/gitweb/?p=gnuk/neug.git">http://git.gniibe.org/gitweb/?p=gnuk/neug.git</a> (Yutaka Niibe, DebConf 2014)</li>
+					</ul>
+				</section>
+			</section>
+
 
 			<section>
 				<section>
@@ -331,29 +376,6 @@
 					<li>Even though you <em>should</em> use <code>/dev/urandom</code>, not all your legacy code does</li>
 					<li>OneRNG helps to avoid the need to block</li>
 					<li>Therefore systems that use <code>/dev/random</code> <em>run faster</em>?</li>
-					</ul>
-				</section>
-			</section>
-
-			<section>
-				<section>
-					<h2>Appendix: Other RNGs</h2>
-				</section>
-				<section>
-					<h2>The more the merrier</h2>
-					<ul>
-					<li>A small quantity of good entropy is enough to improve everything</li>
-					<li>But the more independent sources of entropy you have, the better off you are</li>
-					<li>As well as OneRNG, please add other sources</li>
-					</ul>
-				</section>
-				<section>
-					<h2>Complements to OneRNG</h2>
-					<ul>
-						<li>SW: <strong>rtl-entropy</strong> from SDR - <a href="https://github.com/pwarren/rtl-entropy">https://github.com/pwarren/rtl-entropy</a> (Paul Warren, LCA2014)</li>
-						<li>HW: <strong>USBtrng</strong> - <a href="http://altusmetrum.org/USBtrng/">http://altusmetrum.org/USBtrng/</a> (Bdale Garbee/Keith Packard, DebConf 2014)</li>
-						<li>SW: <strong>Turbid</strong> from audio I/O - <a href="http://www.av8n.com/turbid/">http://www.av8n.com/turbid/</a> (John Denker, 2002-date)</li>
-						<li>HW: <strong>NeuG</strong> ("noisy") - <a href="http://git.gniibe.org/gitweb/?p=gnuk/neug.git">http://git.gniibe.org/gitweb/?p=gnuk/neug.git</a> (Yutaka Niibe, DebConf 2014)</li>
 					</ul>
 				</section>
 			</section>
@@ -416,23 +438,14 @@
 					</ul>
 				</section>
 
-
-
-
 			</section>
 
 				<section>
 					<section>
-						<h2>Q &amp; A</h2>
-						<h3>http://onerng.info/</h3>
-					</section>
-					<section>
 						<h2>Credits</h2>
 						<p>Presentation resources :-</p>
 						<div id="creditspage">
-						<hr/>
 						<p>Software - <a href="https://github.com/hakimel/reveal.js">reveal.js</a>, hosted on <a href="https://github.com/">Github</a></p>
-						<hr/>
 						<img id="iconic" src="thenounprojectlogo.svg"/>
 						<p>Icons used are from <a href="http://thenounproject.com/">The Noun Project</a>, <a href="http://creativecommons.org/licenses/by/3.0/us/">http://creativecommons.org/licenses/by/3.0/us/</a> licensed</p>
 						<p>
