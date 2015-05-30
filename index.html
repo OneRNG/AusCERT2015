@@ -1,0 +1,503 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+
+		<title>OneRNG - how to be unpredictable in a deterministic world</title>
+
+		<meta name="description" content="OneRNG">
+		<meta name="author" content="Jim Cheetham">
+
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<link rel="stylesheet" href="css/reveal.min.css">
+		<link rel="stylesheet" href="css/theme/serif.css" id="theme">
+
+		<!-- For syntax highlighting -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<!-- If the query includes 'print-pdf', include the PDF print sheet -->
+		<script>
+			if( window.location.search.match( /print-pdf/gi ) ) {
+				var link = document.createElement( 'link' );
+				link.rel = 'stylesheet';
+				link.type = 'text/css';
+				link.href = 'css/print/pdf.css';
+				document.getElementsByTagName( 'head' )[0].appendChild( link );
+			}
+		</script>
+
+		<!--[if lt IE 9]>
+		<script src="lib/js/html5shiv.js"></script>
+		<![endif]-->
+
+		<style type="text/css">
+.reveal section img#iconic { border:none; opacity:1; background: white; }
+.reveal section div#creditspage { font-size:50%; }
+		</style>
+	</head>
+
+	<body>
+
+		<div class="reveal">
+
+			<!-- Any section element inside of this container is displayed as a slide -->
+			<div class="slides">
+				<section>
+					<section>
+					<h1>OneRNG</h1>
+					<p><em>How to be unpredictable in a deterministic world</em></p>
+					<h3>AusCERT 2015</h3>
+					<p>Jim Cheetham</p>
+					<p><small><a href="http://onerng.info/">OneRNG.info</a><br/>
+					Information Security Office, University of Otago, NZ<br/>
+					<p><code>&lt;jim.cheetham@otago.ac.nz&gt;</code></small></p>
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h2>OneRNG</h2>
+						<h3>Abstract:</h3>
+						<ul>
+							<li>Project Motivation</li>
+							<li>Technical Solution</li>
+							<li>Implementation</li>
+						</ul>
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h2>OneRNG Project<br/>Motivation</h2>
+						<ul>
+							<li>Security requires <em>secrets</em></li>
+							<li>Secrets need to be <em>unpredictable</em></li>
+							<li>Computers are <em>deterministic</em></li>
+							<li>Existing entropy sources are <em>inadequate</em></li>
+						<ul>
+					</section>
+					<section>
+						<h2>Security requires <em>secrets</em></h2>
+						<p>Examples of secrets in computer security:</p>
+						<ul>
+							<li>Pass <strike>words</strike> phrases</li>
+							<li>Encryption keys - symmetric or public/private</li>
+							<li>Session identifiers</li>
+							<li>Address Space Layout Randomisation</li>
+						</ul>
+					</section>
+					<section>
+						<h2>Secrets need to be<br/><em>unpredictable</em></h2>
+						<ul>
+							<li>Today is Wednesday June 3<sup>rd</sup>. If my daily password is "Wed3", what might it be tomorrow?</li>
+							<li>My password is an English word; what is the chance that the second letter is a vowel? (27/53 &cong; 50%)</li>
+							<li>When my server is rebooted, the first TCP sequence number is "1". What will the second one be?</li>
+						</ul>
+					</section>
+					<section>
+						<h2>Computers are<br/><em>deterministic</em></h2>
+						<p>Given the same input conditions, we require hardware and software to produce the same output.</p>
+						<ul>
+							<li>Pseudo-Random Number Generators - PRNG<br/>Deterministic Random Bit Generators - DRBG<br/>Cryptographically Secure PRNG - CSPRNG</li>
+							<li>These <em>approximate</em> true random numbers. Examples: Middle Square, RANDU, Mersenne Twister, Dual_EC_DRBG</li>
+							<li>Inherent problems: Periodicity, Output Artifacts, Provability</li>
+							<li>True Random seed values are required</li>
+						</ul>
+					</section>
+					<section>
+						<h2>Existing entropy sources are <em>inadequate</em></h2>
+						<p>Measuring the environment <em>external</em> to the computer to achieve local unpredictability</p>
+						<ul>
+							<li>Keyboard &amp; mouse activity</li>
+							<li>Hardware interrupt timing</li>
+							<li>Device drivers may provide environmental data</li>
+							<li>Specialist devices are <em>untrustable</em> e.g. RdRand</li>
+						</ul>
+					</section>
+	
+					
+				</section>
+
+				<section>
+                  	<section>
+						<h2>OneRNG<br/>Technical Solution</h2>
+						<ul>
+							<li>OneRNG is an Open Hardware device</li>
+							<li>It is designed to be <em>verifiable</em>, not trusted</li>
+							<li>It is a low-cost, effective solution to the problem</li>
+						</ul>
+                  	</section>
+					<section>
+						<h2>It has a Tin-Foil Hat</h2>
+						<img src="Board-800.png">
+					</section>
+					<section>
+						<h2>It has a Tin-Foil Hat</h2>
+						<img src="BoardAndTinfoilHat-800.png">
+					</section>
+                  	<section>
+                    	<h2>Entropy Collector</h2>
+						<img id="iconic" src="avalanche.svg"/>
+                    	<p>By default, OneRNG measures <i>unpredictable</i> physical events<br/>
+                    	from an <strong>avalanche diode</strong> circuit<br/>
+                    	and returns the results &mdash; but there are biases</p>
+                  	</section>
+                  	<section>
+                    	<h2>Environmental Noise</h2>
+						<img id="iconic" src="radio.svg"/>
+                    	<p>You can also enable the RF monitor to get another source of entropy data
+                    	with a higher quality &mdash; but at the cost of a little paranoia</p>
+                  	</section>
+                  	<section>
+                    	<h2>Whitened data</h2>
+						<img id="iconic" src="toothbrush.svg"/>
+                    	<p>This raw data is then whitened through a CRC16 function
+                    	which makes it good enough to be fed into your system</p>
+						<p>There is an AES hardware module available, but it is not used
+						by the default firmware (trust issues)</p>
+                  	</section>
+				  	<section>
+						<h2>Keep topping up the pool</h2>
+						<img id="iconic" src="pool.svg"/>
+						<p>There's a 7.5KB pool of data that is kept full</p>
+						<p>New data is mixed in over the old data <em>all</em> the time</p>
+						<p>A LED on the board tells you when the pool is full<br/>
+						and warns you when it is getting empty</p>
+				  	</section>
+                  	<section>
+                    	<h2><code>Output</code></h2>
+						<img id="iconic" src="dice.svg"/>
+						<p>The output from OneRNG should be used as an Entropy input to your existing systems (preferably OS)</p>
+						<p>We provide ~7.5 bits of entropy per byte of data</>
+                  	</section>
+					<section>
+						<h2>The flow of data</h2>
+						<img src="OneRNGdataflow.svg"/>
+						<p>The user controls the choice of sources</p>
+						<p>The user controls the use of Whitening</p>
+						<p>The user controls where the results go</p>
+					</section>
+                    <section>
+                    	<h2>No Trust Needed</h2>
+						<img id="iconic" src="skydiving.svg"/>
+						<ul>
+                    	<li>You should not trust this device &mdash; you do not <i>need</i> to trust this device</li>
+                    	<li>You should <strong><i>VERIFY</i></strong> that what you physically hold is what you need to have</li>
+						<li>(Yes, we manufacture them in China)</li>
+						</ul>
+                    </section>
+                    <section>
+                    	<h2>How to verify<br/>the hardware</h2>
+						<p><img id="iconic" src="cpu.svg"/></p>
+                    	<ol>
+                           	<li>Remove the Tin-Foil Hat (ours, not yours)</li>
+                           	<li>Identify the components</li>
+                           	<li>Identify the connections, top and bottom</li>
+                           	<li>Research the one complex component, the CC2531 chip</li>
+                           	<li>See how much storage it has (256KB or 128KB)</li>
+                    	</ol>
+                    </section>
+                    <section>
+                    	<h2>How to verify<br/>the software</h2>
+						<p><img id="iconic" src="certificate.svg"/></p>
+                        <ol>
+                           	<li>Plug the device into a machine</li>
+                           	<li>Dump the firmware into a file</li>
+                           	<li>Confirm the data is the full 256KB</li>
+                           	<li>Validate the GPG signature</li>
+                           	<li>Confirm the data is &lsquo;uncompressible&rsquo;</li>
+                        </ol>
+                        <p>Scripts on your server should do steps 2,3 &amp; 4 on startup</p>
+                    </section>
+					<section>
+						<h2>Why verify?</h2>
+						<p><img id="iconic" src="search.svg"/></p>
+						<ul>
+							<li>The hardware you received conforms with the description</li>
+							<li>The firmware that is used matches the source</li>
+							<li>Tampering should be detectable</li>
+						</ul>
+					</section>
+				</section>
+
+			<section>
+				<section>
+					<h2>OneRNG Implementation</h2>
+					<p>How do we go from a design to an actual product?</p>
+					<ul>
+						<li>Hand-made beta units</li>
+						<li>Fundraising via Kickstarter</li>
+						<li>Bulk-buying components</li>
+						<li>Develop construction-line</li>
+						<li>Build units (under supervision)</li>
+						<li>Provide online store</li>
+						<li>Profit!!!</li>
+					</ul>
+				</section>
+
+				<section>
+					<h2>Beta units - v1.0</h2>
+					<ul>
+						<li>Moonbase Otago - Paul Campbell</li>
+						<li>Re-using existing Zigbee projects</li>
+						<li>Built in Dunedin (small Pick &amp; Place machine)</li>
+						<li>Hand-finished</li>
+						<li>Sent to crypto and hardware people that we know for comment</li>
+					</ul>
+				</section>
+
+				<section>
+					<h2><img id="iconic" src="kickstarter-logo-light.svg"/></h2>
+					<p>To get volume production set up, we used Kickstarter
+					with an NZD<strong>$10,000</strong> target over 45 days<p>
+					<ul>
+					<li>50%&nbsp;&nbsp;funded after 2 days</li>
+					<li>100% funded after 6 days</li>
+					<li>200% funded after 18 days</li>
+					<li>485% funded at close : NZD<strong>$48,551</strong></li>
+					</ul>
+				</section>
+
+				<section>
+					<h2><img id="iconic" src="kickstarter-logo-light.svg"/></h2>
+					<p>Rewards Options</p>
+					<p>We offered combinations of:</p>
+					<ul>
+						<li>NZD $50 - a single OneRNG from bulk manufacturing</li>
+						<li>NZD $90 - a device programmer unit</li>
+						<li>NZD $110 - a single hand-built unit</li>
+					</ul>
+				</section>
+
+				<section>
+					<h2>Setting up a<br/>construction-line</h2>
+					<ul>
+						<li>Shenzen has a good 'Western Hacker' vibe (q.v. bunnie Huang et. al.)</li>
+						<li>Lots of technically competant suppliers available for each stage</li>
+						<li>PCBs are big enough for 24 OneRNGs on a single board; these need cutting</li>
+						<li>We built the test equipment, which also programs the units</li>
+						<li>An additional image signing stage requires an NZ-based server to generate keys</li>
+						<li>Dispatch is direct from Shenzen; this simplifies sales tax</li>
+					</ul>
+				</section>
+
+				<section>
+					<h2>Building OneRNG<br/>in Shenzen</h2>
+					<ul>
+						<li>Paul has just spent 2 weeks in Shenzen</li>
+						<li>We had a 5% failure rate (most can be manually fixed)</li>
+						<li>We can fulfil the Kickstarter orders</li>
+						<li>Next, we sell the excess stock online</li>
+					</ul>
+				</section>
+
+			</section>
+
+			<section>
+				<section>
+					<h2>Appendix: Linux <code>/dev/random</code></h2>
+				</section>
+				<section>
+					<h2>Why does <code>/dev/random</code> block?</h2>
+					<ul>
+					<li>The NSA-designed SHA-1 was not fully "trusted"</li>
+					<li>The blocking behaviour is a defence against this untrusted DRBG
+					<blockquote>Ted T'so, 2015 &ldquo;&hellip; the
+						paranoiacs were *right* that the NSA had introduced a back-door into a
+						crypto algorithm which they gifted to the civilian world.  It just
+						turned out to be DUAL-EC instead of SHA-1.&rdquo;</blockquote></li>
+					<li>Just use <em><code>/dev/urandom</code></em> :-)</li>
+					</ul>
+				</section>
+				<section>
+					<h2>What's the difference between <code>/dev/random</code> and <code>/dev/urandom</code>?</h2>
+					<ul>
+					<li>These are fundamentally the same :-)</li>
+					<li>&ldquo;<code>/dev/urandom</code> doesn't block; <code>/dev/random</code> does&rdquo;</li>
+					<li>They will behave identically with sufficient entropy</li>
+					<li>Use <code>/dev/urandom</code></li>
+					<li>Use <code>/dev/urandom</code></li>
+					<li>Use <code>/dev/urandom</code></li>
+					</ul>
+				</section>
+				<section>
+					<h2>How does OneRNG help <code>/dev/random</code>?</h2>
+					<ul>
+					<li>Even though you <em>should</em> use <code>/dev/urandom</code>, not all your legacy code does</li>
+					<li>OneRNG helps to avoid the need to block</li>
+					<li>Therefore systems that use <code>/dev/random</code> <em>run faster</em>?</li>
+					</ul>
+				</section>
+			</section>
+
+			<section>
+				<section>
+					<h2>Appendix: Other RNGs</h2>
+				</section>
+				<section>
+					<h2>The more the merrier</h2>
+					<ul>
+					<li>A small quantity of good entropy is enough to improve everything</li>
+					<li>But the more independent sources of entropy you have, the better off you are</li>
+					<li>As well as OneRNG, please add other sources</li>
+					</ul>
+				</section>
+				<section>
+					<h2>Complements to OneRNG</h2>
+					<ul>
+						<li>SW: <strong>rtl-entropy</strong> from SDR - <a href="https://github.com/pwarren/rtl-entropy">https://github.com/pwarren/rtl-entropy</a> (Paul Warren, LCA2014)</li>
+						<li>HW: <strong>USBtrng</strong> - <a href="http://altusmetrum.org/USBtrng/">http://altusmetrum.org/USBtrng/</a> (Bdale Garbee/Keith Packard, DebConf 2014)</li>
+						<li>SW: <strong>Turbid</strong> from audio I/O - <a href="http://www.av8n.com/turbid/">http://www.av8n.com/turbid/</a> (John Denker, 2002-date)</li>
+						<li>HW: <strong>NeuG</strong> ("noisy") - <a href="http://git.gniibe.org/gitweb/?p=gnuk/neug.git">http://git.gniibe.org/gitweb/?p=gnuk/neug.git</a> (Yutaka Niibe, DebConf 2014)</li>
+					</ul>
+				</section>
+			</section>
+
+
+			<section>
+				<section>
+					<h2>Appendix:<br/>PRNG Problems</h2>
+				</section>
+
+				<section>
+					<h2>Middle Square</h2>
+					<ul>
+					<li>First documented by Franciscan Brother Edvin in around 1240-1250 CE</li>
+					<li>Re-discovered by John von Neumann, published in 1949
+					<blockquote>"Any one who considers arithmetical methods of producing random digits is, of course, in a state of sin."</blockquote></li>
+					<li>Unstable output, many pathological seed values</li>
+					</ul>
+				</section>
+
+				<section>
+					<h2>Middle Square</h2>
+					<p>Example with 4-digit seed:</p>
+					<ul>
+						<li>1234 - start with a 4 digit seed as the initial input</li>
+						<li>1234<sup><small>2</small></sup> = 01522756 - square and pad to 8 digits with leading 0</li>
+						<li>01<u>5227</u>56 - output the middle 4 digits, use this as the next input</li>
+						<li>1234 &rarr; 5227 &rarr; 3215 &rarr; 3362 &hellip;</li>
+						<li><em><strong>BUT</strong></em> 0000 &rarr; 0000, same for 0100, 2500, 3792, 7600</li>
+						<li>Many short cycles: 0540 &rarr; 2916 &rarr; 5030 &rarr; 3009 &rarr; 0540</li>
+						<li>Seed 1234 hits 0000 after 56 iterations</li>
+					<ul>
+				</section>
+
+				<section>
+					<h2>RANDU</h2>
+					<ul>
+					<li>Designed for the 1960's IBM System/360</li>
+					<li>V<sub><small>j+1</small></sub> = 65539 . V<small><sub>j</small></sub> mod 2 31 (V<sub><small>0</small></sub> must be odd)</li>
+					<li>Very fast on the system's limited hardware</li>
+					<li><em><strong>BUT</strong></em> every 3 output values have a strong relationship</li>
+					</ul>
+				</section>
+				<section>
+					<h2>RANDU</h2>
+					<ul>
+						<li>100002 values from RANDU, plotted as 100000 consecutive triples (x,y,z)</li>
+						<img class="iconic" src="randu.png"/>
+					</ul>
+				</section>
+
+				<section>
+					<h2>Dual_EC_DRBG</h2>
+					<ul>
+						<li>Published in 2004</li>
+						<li>Adopted as a NIST standard (SP 800-90A) in 2007 despite technical reservations</li>
+						<li>Exposed in 2013 as backdoored by the NSA as part of &ldquo;Bullrun&rdquo; by Edward Snowden</li>
+						<li>Exposed in 2013 that RSA Security had been paid US$10 million in 2004 to make Dual_EC_DRBG the default for the RSA BSAFE libraries</li>
+						<li>Withdrawn from NIST SP 800-90A in 2014</li>
+					</ul>
+				</section>
+
+
+
+
+			</section>
+
+				<section>
+					<section>
+						<h2>Q &amp; A</h2>
+						<h3>http://onerng.info/</h3>
+					</section>
+					<section>
+						<h2>Credits</h2>
+						<p>Presentation resources :-</p>
+						<div id="creditspage">
+						<hr/>
+						<p>Software - <a href="https://github.com/hakimel/reveal.js">reveal.js</a>, hosted on <a href="https://github.com/">Github</a></p>
+						<hr/>
+						<img id="iconic" src="thenounprojectlogo.svg"/>
+						<p>Icons used are from <a href="http://thenounproject.com/">The Noun Project</a>, <a href="http://creativecommons.org/licenses/by/3.0/us/">http://creativecommons.org/licenses/by/3.0/us/</a> licensed</p>
+						<p>
+							<a href="http://thenounproject.com/term/arrow/6160/">Arrow</a> and <a href="http://thenounproject.com/term/arrow/6161/">Bent Arrow</a> by Thomas Le Bas, 
+							<a href="http://thenounproject.com/term/dice/15764/">Dice</a> by Weston Terrill, 
+							<a href="http://thenounproject.com/term/toothbrush/15845/">Toothbrush</a>, <a href="http://thenounproject.com/term/radio/16174/">Radio</a> by Joe Harrison, 
+							<a href="http://thenounproject.com/term/avalanche/63117/">Avalanche</a> by Louis Dawson, 
+							<a href="http://thenounproject.com/term/swimming-pool/37082/">Swimming Pool</a> by Sitara Shah, 
+							<a href="http://thenounproject.com/term/clock/6087/">Clock</a> by Nick Green, 
+							<a href="http://thenounproject.com/term/guy-fawkes/25567/">Guy Fawkes</a> by Christopher T. Howlett, 
+							<a href="http://thenounproject.com/term/pac-man/39007/">Pac-Man</a> by Luigi Di Capua, 
+							<a href="http://thenounproject.com/term/surveillance/35171/">Surveillance</a> by Luis Prado, 
+							<a href="http://thenounproject.com/term/audit/21699/">Audit</a> by Miroslav Koša, 
+							<a href="http://thenounproject.com/term/skydiving/26955/">Skydiving</a> by Jual Pablo Bravo, 
+							<a href="http://thenounproject.com/term/cpu/69236/">CPU</a> by iconsmind.com, 
+							<a href="http://thenounproject.com/term/certificate/33227/">Certificate</a> by Alex Auda Samora, 
+							<a href="http://thenounproject.com/term/ingognito/43595/">Incognito</a> by Alen Krummenacher, 
+							<a href="http://thenounproject.com/term/layers/26871/">Layers</a> by Cornelius Danger, 
+							<a href="http://thenounproject.com/term/search/71764/">Search</a> by Melvin Salas, 
+							<a href="http://thenounproject.com/term/infographic/12034/">Infographic</a> by Rob Gill,
+							<a href="http://thenounproject.com/term/seed-packet/41684/">Seed Packet</a> by Anton Gajdosik (Public Domain)
+						</p>
+						<p>RANDU visualisation from Wikipedia's RANDU page</p>
+						<p>OneRNG photos from Jim Cheetham and Paul Campbell</p>
+						</div>
+					</section>
+				</section>
+
+
+			</div> <!-- End of slides -->
+
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.min.js"></script>
+
+		<script>
+
+			// Full list of configuration options available here:
+			// https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				controls: true,
+				progress: true,
+				history: true,
+				center: true,
+
+				theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+				transition: Reveal.getQueryHash().transition || 'concave', // default/cube/page/concave/zoom/linear/fade/none
+
+				// Parallax scrolling
+				// parallaxBackgroundImage: 'https://s3.amazonaws.com/hakim-static/reveal-js/reveal-parallax-1.jpg',
+				// parallaxBackgroundSize: '2100px 900px',
+
+				// Optional libraries used to extend on reveal.js
+				dependencies: [
+					{ src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+					{ src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+					{ src: 'plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+					{ src: 'plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
+				]
+			});
+
+		</script>
+
+	</body>
+</html>
